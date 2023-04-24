@@ -4,14 +4,30 @@ declare(strict_types=1);
 
 namespace DiggPHP\Psr14;
 
-use Fig\EventDispatcher\ParameterDeriverTrait;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
+use Psr\EventDispatcher\StoppableEventInterface;
+use Fig\EventDispatcher\ParameterDeriverTrait;
 use SplPriorityQueue;
 
-class ListenerProvider implements ListenerProviderInterface
+class Event implements EventDispatcherInterface, ListenerProviderInterface
 {
     use ParameterDeriverTrait;
     private $listeners = [];
+
+    public function dispatch(object $event)
+    {
+        if ($event instanceof StoppableEventInterface && $event->isPropagationStopped()) {
+            return $event;
+        }
+        foreach ($this->getListenersForEvent($event) as $listener) {
+            $listener($event);
+            if ($event instanceof StoppableEventInterface && $event->isPropagationStopped()) {
+                break;
+            }
+        }
+        return $event;
+    }
 
     public function getListenersForEvent(object $event): iterable
     {

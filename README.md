@@ -11,16 +11,15 @@ composer require diggphp/psr14
 ## Usage
 
 ``` php
-$provider = new ListenerProvider;
-$event = new EventDispatcher($provider);
+$event = new Event();
 
-$provider->listen(function (stdClass $obj) {
+$event->listen(function (stdClass $obj) {
     echo 'foo';
 }, 2);
-$provider->listen(function (stdClass $obj) {
+$event->listen(function (stdClass $obj) {
     echo 'bar';
 }, 1);
-$provider->listen(function (stdClass $obj) {
+$event->listen(function (stdClass $obj) {
     echo 'baz';
 }, 3);
 
